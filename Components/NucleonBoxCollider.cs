@@ -8,22 +8,21 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
     public bool Trigger;
     public NucleonMaterial NucleonMaterial;
     public float CollisionOverlapThreshold = 0.001f;
+    public Vector3 Position;
+    public Vector3 Scale;
 
     [HideInInspector] public CubeModel CubeModel { get; private set; }
     [HideInInspector] public bool Colliding { get; private set; }
     [HideInInspector] public List<NucleonCollider> ActiveCollisions { get; private set; }
-    [HideInInspector] public Vector3 PositionDelta;
+    [HideInInspector] public Vector3 DeltaPosition;
     [HideInInspector] public Vector3 LastPosition;
 
-    private Transform TransformInstance;
     private NucleonManager NucleonManager;
 
     void Awake()
     {
-        TransformInstance = GetComponent<Transform>();
-
-        CubeModel = new CubeModel(TransformInstance);
-        CubeModel.UpdateBounds();
+        CubeModel = new CubeModel();
+        CubeModel.UpdateBounds(transform, Position, Scale);
 
         ActiveCollisions = new List<NucleonCollider>();
         NucleonManager = FindObjectOfType<NucleonManager>();
@@ -33,10 +32,10 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
 
     void UpdateCollisions()
     {
-        CubeModel.UpdateBounds();
+        CubeModel.UpdateBounds(transform, Position, Scale);
         Colliding = ActiveCollisions.Count > 0;
-        PositionDelta = transform.position - LastPosition;
-        LastPosition = transform.position;
+        DeltaPosition = (transform.position + Position) - LastPosition;
+        LastPosition = (transform.position + Position);
 
         FetchCollisions();
     }
@@ -57,23 +56,28 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
     {
         if (Colliding)
         {
-            NucleonCollision collision = new NucleonCollision();
-            collision.SelfCollider = this;
-            collision.OtherCollider = BoxCollider;
-            collision.CollisionDirection = PositionDelta;
+            NucleonCollision Collision = new NucleonCollision();
+            Collision.SelfCollider = this;
+            Collision.OtherCollider = BoxCollider;
+            Collision.CollisionDirection = DeltaPosition;
 
             if (!ActiveCollisions.Contains(BoxCollider))
             {
                 ActiveCollisions.Add(BoxCollider);
-                GetComponent<NucleonBody>()?.OnNucleonCollisionEnter(collision);
+                GetComponent<NucleonBody>()?.OnNucleonCollisionEnter(Collision);
             }
         }
         else
         {
             if (ActiveCollisions.Contains(BoxCollider))
             {
+                NucleonCollisionExit CollisionExit = new NucleonCollisionExit();
+                CollisionExit.SelfCollider = this;
+                CollisionExit.OtherCollider = BoxCollider;
+                CollisionExit.ExitDirection = DeltaPosition;
+
                 ActiveCollisions.Remove(BoxCollider);
-                GetComponent<NucleonBody>()?.OnNucleonCollisionExit();
+                GetComponent<NucleonBody>()?.OnNucleonCollisionExit(CollisionExit);
             }
         }
     }
@@ -85,15 +89,28 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
                (A.MinZ <= B.MaxZ && A.MaxZ >= B.MinZ);
     }
 
+    private bool PointCubeIntersect(Vector3 Point, CubeModel Cube)
+    {
+        return (Point.x >= Cube.MinX && Point.x <= Cube.MaxX) &&
+               (Point.y >= Cube.MinY && Point.y <= Cube.MaxY) &&
+               (Point.z >= Cube.MinZ && Point.z <= Cube.MaxZ);
+    }
+
     void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
         try
         {
-            foreach (Vector3 Verticie in CubeModel.Vertices)
-            {
-                Gizmos.DrawSphere(Verticie, 0.05f);
-            }
+            Gizmos.DrawWireCube(
+                new Vector3(
+                    transform.position.x + Position.x, 
+                    transform.position.y + Position.y, 
+                    transform.position.z + Position.z), 
+                new Vector3(
+                    transform.localScale.x + Scale.x, 
+                    transform.localScale.y + Scale.y, 
+                    transform.localScale.z + Scale.z)
+                );
         }
         catch{}
     }
@@ -108,22 +125,23 @@ public class CubeModel
     public float MaxZ;
     public float MinZ;
     public Vector3[] Vertices;
+    public Vector3 Position;
+    public Vector3 Scale;
 
     private Transform transform;
 
-    public CubeModel(Transform transformInstance)
+    public void UpdateBounds(Transform transform, Vector3 Position, Vector3 Scale)
     {
-        transform = transformInstance;
-    }
+        this.transform = transform;
+        this.Position = Position;
+        this.Scale = Scale;
 
-    public void UpdateBounds()
-    {
-        MaxX = transform.position.x + transform.localScale.x / 2;
-        MinX = transform.position.x + transform.localScale.x / -2;
-        MaxY = transform.position.y + transform.localScale.y / 2;
-        MinY = transform.position.y + transform.localScale.y / -2;
-        MaxZ = transform.position.z + transform.localScale.z / 2;
-        MinZ = transform.position.z + transform.localScale.z / -2;
+        MaxX = (transform.position.x + Position.x + (transform.localScale.x + Scale.x) / 2);
+        MinX = (transform.position.x + Position.x + (transform.localScale.x + Scale.x) / -2);
+        MaxY = (transform.position.y + Position.y + (transform.localScale.y + Scale.y) / 2);
+        MinY = (transform.position.y + Position.y + (transform.localScale.y + Scale.y) / -2);
+        MaxZ = (transform.position.z + Position.z + (transform.localScale.z + Scale.z) / 2);
+        MinZ = (transform.position.z + Position.z + (transform.localScale.z + Scale.z) / -2);
 
         Vertices = new[]
         { 

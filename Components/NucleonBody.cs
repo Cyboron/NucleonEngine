@@ -8,9 +8,11 @@ public class NucleonBody : MonoBehaviour
     public float GravityScale;
 
     [HideInInspector] public Vector3 Velocity;
+    [HideInInspector] public Vector3 AbsoluteVelocity;
     [HideInInspector] public bool Grounded { get; private set; }
     [HideInInspector] public NucleonBoxCollider Ground { get; private set; }
 
+    private Vector3 CalculationVelocity;
     private float GravityTimer;
 
     void Start()
@@ -20,38 +22,50 @@ public class NucleonBody : MonoBehaviour
 
     void Update()
     {
-        transform.position += Velocity * Time.deltaTime;
         GravityTimer += Time.deltaTime;
-
         if (!Grounded)
         {
-            Velocity.y += -GravityScale / 100 * GravityTimer;
+            CalculationVelocity.y += -GravityScale / 100 * GravityTimer;
         }
+
+        AbsoluteVelocity = CalculationVelocity + Velocity;
+
+        transform.position += AbsoluteVelocity * Time.deltaTime;
     }
 
     public void OnNucleonCollisionEnter(NucleonCollision Collision)
     {
-        if(Collision.CollisionDirection.y < 0)
+        if (Collision.CollisionDirection.y < 0)
         {
             Grounded = true;
             Ground = Collision.OtherCollider;
-            Velocity.y = 0;
+            CalculationVelocity.y = 0;
             GravityTimer = 0;
-            transform.position = new Vector3(transform.position.x, (transform.localScale.y / 2) + Collision.OtherCollider.CubeModel.MaxY - Collision.SelfCollider.CollisionOverlapThreshold, transform.position.z);
+            transform.position = new Vector3(
+                transform.position.x + Collision.SelfCollider.Position.x, 
+                ((transform.localScale.y + Collision.SelfCollider.Scale.y) / 2) + Collision.OtherCollider.CubeModel.MaxY - Collision.SelfCollider.CollisionOverlapThreshold - Collision.SelfCollider.Position.y, 
+                transform.position.z + Collision.SelfCollider.Position.z);
+        }
+        if (Collision.CollisionDirection.y > 0)
+        {
+            CalculationVelocity.y = 0;
         }
     }
 
-    public void OnNucleonCollisionExit()
+    public void OnNucleonCollisionExit(NucleonCollisionExit CollisionExit)
     {
-        Grounded = false;
-        Ground = null;
-        GravityTimer = 0;
+        if(CollisionExit.OtherCollider == Ground)
+        {
+            Grounded = false;
+            Ground = null;
+            GravityTimer = 0;
+        }
     }
 
     public void AddForce(float Force, Vector3 Direction)
     {
         float Acceleration = Force / Mass;
-        Velocity += new Vector3(Direction.x * Acceleration, Direction.y * Acceleration, Direction.z * Acceleration);
+        CalculationVelocity += new Vector3(Direction.x * Acceleration, Direction.y * Acceleration, Direction.z * Acceleration);
         GravityTimer = 0;
     }
 }
