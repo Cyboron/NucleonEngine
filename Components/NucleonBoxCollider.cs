@@ -18,6 +18,7 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
     [HideInInspector] public Vector3 LastPosition;
 
     private NucleonManager NucleonManager;
+    private List<Vector3> CollidingPoints = new List<Vector3>();
 
     void Awake()
     {
@@ -42,14 +43,29 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
 
     public void FetchCollisions()
     {
+        List<Vector3> CollidingPointsFetchList = new List<Vector3>();
+
         foreach (NucleonBoxCollider BoxCollider in NucleonManager.Colliders)
         {
             if(BoxCollider != this)
             {
-                bool Colliding = CubeIntersect(CubeModel, BoxCollider.CubeModel);
+                bool Colliding = NucleonIntersector.CC_I(CubeModel, BoxCollider.CubeModel);
                 CollisionCheck(Colliding, BoxCollider);
+
+                if (Colliding)
+                {
+                    foreach (Vector3 Verticie in CubeModel.Vertices)
+                    {
+                        if(NucleonIntersector.PC_I(Verticie, BoxCollider.CubeModel))
+                        {
+                            CollidingPointsFetchList.Add(Verticie);
+                        }
+                    }
+                }
             }
         }
+
+        CollidingPoints = CollidingPointsFetchList;
     }
 
     private void CollisionCheck(bool Colliding, NucleonBoxCollider BoxCollider)
@@ -82,25 +98,11 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
         }
     }
 
-    private bool CubeIntersect(CubeModel A, CubeModel B)
-    {
-        return (A.MinX <= B.MaxX && A.MaxX >= B.MinX) &&
-               (A.MinY <= B.MaxY && A.MaxY >= B.MinY) &&
-               (A.MinZ <= B.MaxZ && A.MaxZ >= B.MinZ);
-    }
-
-    private bool PointCubeIntersect(Vector3 Point, CubeModel Cube)
-    {
-        return (Point.x >= Cube.MinX && Point.x <= Cube.MaxX) &&
-               (Point.y >= Cube.MinY && Point.y <= Cube.MaxY) &&
-               (Point.z >= Cube.MinZ && Point.z <= Cube.MaxZ);
-    }
-
     void OnDrawGizmos()
     {
-        Gizmos.color = Color.green;
         try
         {
+            Gizmos.color = Color.green;
             Gizmos.DrawWireCube(
                 new Vector3(
                     transform.position.x + Position.x, 
@@ -111,50 +113,13 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
                     transform.localScale.y + Scale.y, 
                     transform.localScale.z + Scale.z)
                 );
+
+            Gizmos.color = Color.blue;
+            foreach (Vector3 Point in CollidingPoints)
+            {
+                Gizmos.DrawSphere(Point, 0.1f);
+            }
         }
         catch{}
-    }
-}
-
-public class CubeModel
-{
-    public float MaxX;
-    public float MinX;
-    public float MaxY;
-    public float MinY;
-    public float MaxZ;
-    public float MinZ;
-    public Vector3[] Vertices;
-    public Vector3 Position;
-    public Vector3 Scale;
-
-    private Transform transform;
-
-    public void UpdateBounds(Transform transform, Vector3 Position, Vector3 Scale)
-    {
-        this.transform = transform;
-        this.Position = Position;
-        this.Scale = Scale;
-
-        MaxX = (transform.position.x + Position.x + (transform.localScale.x + Scale.x) / 2);
-        MinX = (transform.position.x + Position.x + (transform.localScale.x + Scale.x) / -2);
-        MaxY = (transform.position.y + Position.y + (transform.localScale.y + Scale.y) / 2);
-        MinY = (transform.position.y + Position.y + (transform.localScale.y + Scale.y) / -2);
-        MaxZ = (transform.position.z + Position.z + (transform.localScale.z + Scale.z) / 2);
-        MinZ = (transform.position.z + Position.z + (transform.localScale.z + Scale.z) / -2);
-
-        Vertices = new[]
-        { 
-            new Vector3(MaxX, MaxY, MaxZ),
-            new Vector3(MinX, MinY, MinZ),
-
-            new Vector3(MaxX, MinY, MinZ),
-            new Vector3(MinX, MaxY, MinZ),
-            new Vector3(MinX, MinY, MaxZ),
-
-            new Vector3(MaxX, MinY, MaxZ),
-            new Vector3(MinX, MaxY, MaxZ),
-            new Vector3(MaxX, MaxY, MinZ),
-        };
     }
 }
