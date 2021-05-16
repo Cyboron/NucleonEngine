@@ -4,13 +4,15 @@ using UnityEngine;
 
 public class NucleonBody : MonoBehaviour
 {
+    [Header("Physical Settings")]
     public float Mass;
     public float GravityScale;
 
     [HideInInspector] public Vector3 Velocity;
-    [HideInInspector] public Vector3 AbsoluteVelocity;
-    [HideInInspector] public bool Grounded { get; private set; }
-    [HideInInspector] public NucleonBoxCollider Ground { get; private set; }
+
+    public Vector3 AbsoluteVelocity { get; private set; }
+    public bool Grounded { get; private set; }
+    public NucleonBoxCollider Ground { get; private set; }
 
     private Vector3 CalculationVelocity;
     private float GravityTimer;

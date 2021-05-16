@@ -4,14 +4,12 @@ using UnityEngine;
 
 public class NucleonManager : MonoBehaviour
 {
-    [HideInInspector] public List<NucleonCollider> Colliders = new List<NucleonCollider>();
+    public static NucleonManager Instance;
+    public List<NucleonCollider> Colliders = new List<NucleonCollider>();
 
     void Awake()
     {
-        foreach(NucleonBoxCollider BoxCollider in FindObjectsOfType<NucleonBoxCollider>())
-        {
-            Colliders.Add(BoxCollider);
-        }
+        Instance = this;
     }
 
     public void RegisterCollider(NucleonCollider Collider)

@@ -5,20 +5,28 @@ using UnityEngine;
 
 public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
 {
+    [Header("General Settings")]
     public bool Trigger;
+    public NucleonBody Body;
     public NucleonMaterial NucleonMaterial;
+
+    [Header("Collider Customization")]
     public Vector3 Position;
     public Vector3 Scale;
+
+    [Header("Specific Settings")]
     public float CollisionOverlapThreshold = 0.001f;
+
+    [Header("Debug Settings")]
     public bool DebugCollisionPoints;
     public bool DebugCenterOfGravity;
-
-    [HideInInspector] public CubeModel CubeModel { get; private set; }
-    [HideInInspector] public bool Colliding { get; private set; }
-    [HideInInspector] public List<NucleonCollider> ActiveCollisions { get; private set; }
-    [HideInInspector] public List<Vector3> CollidingPoints { get; private set; }
-    [HideInInspector] public Vector3 DeltaPosition { get; private set; }
-    [HideInInspector] public Vector3 LastPosition { get; private set; }
+    
+    public CubeModel CubeModel { get; private set; }
+    public bool Colliding { get; private set; }
+    public List<NucleonCollider> ActiveCollisions { get; private set; }
+    public List<Vector3> CollidingPoints { get; private set; }
+    public Vector3 DeltaPosition { get; private set; }
+    public Vector3 LastPosition { get; private set; }
 
     private NucleonManager NucleonManager;
 
@@ -30,7 +38,8 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
         ActiveCollisions = new List<NucleonCollider>();
         CollidingPoints = new List<Vector3>();
 
-        NucleonManager = FindObjectOfType<NucleonManager>();
+        NucleonManager = NucleonManager.Instance;
+        NucleonManager.RegisterCollider(this);
     }
 
     void Update()
@@ -84,7 +93,7 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
             if (!ActiveCollisions.Contains(BoxCollider))
             {
                 ActiveCollisions.Add(BoxCollider);
-                GetComponent<NucleonBody>()?.OnNucleonCollisionEnter(Collision);
+                Body?.OnNucleonCollisionEnter(Collision);
             }
         }
         else
@@ -97,7 +106,7 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
                 CollisionExit.ExitDirection = DeltaPosition;
 
                 ActiveCollisions.Remove(BoxCollider);
-                GetComponent<NucleonBody>()?.OnNucleonCollisionExit(CollisionExit);
+                Body?.OnNucleonCollisionExit(CollisionExit);
             }
         }
     }
