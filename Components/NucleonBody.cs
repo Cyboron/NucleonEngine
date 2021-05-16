@@ -23,14 +23,17 @@ public class NucleonBody : MonoBehaviour
     void Update()
     {
         GravityTimer += Time.deltaTime;
+    }
+
+    void FixedUpdate()
+    {
         if (!Grounded)
         {
-            CalculationVelocity.y += -GravityScale / 100 * GravityTimer;
+            CalculationVelocity.y += -GravityScale * GravityTimer;
         }
 
         AbsoluteVelocity = CalculationVelocity + Velocity;
-
-        transform.position += AbsoluteVelocity * Time.deltaTime;
+        transform.position += AbsoluteVelocity * Time.fixedDeltaTime;
     }
 
     public void OnNucleonCollisionEnter(NucleonCollision Collision)
@@ -66,6 +69,5 @@ public class NucleonBody : MonoBehaviour
     {
         float Acceleration = Force / Mass;
         CalculationVelocity += new Vector3(Direction.x * Acceleration, Direction.y * Acceleration, Direction.z * Acceleration);
-        GravityTimer = 0;
     }
 }

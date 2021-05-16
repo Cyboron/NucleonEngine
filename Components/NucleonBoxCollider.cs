@@ -7,18 +7,20 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
 {
     public bool Trigger;
     public NucleonMaterial NucleonMaterial;
-    public float CollisionOverlapThreshold = 0.001f;
     public Vector3 Position;
     public Vector3 Scale;
+    public float CollisionOverlapThreshold = 0.001f;
+    public bool DebugCollisionPoints;
+    public bool DebugCenterOfGravity;
 
     [HideInInspector] public CubeModel CubeModel { get; private set; }
     [HideInInspector] public bool Colliding { get; private set; }
     [HideInInspector] public List<NucleonCollider> ActiveCollisions { get; private set; }
-    [HideInInspector] public Vector3 DeltaPosition;
-    [HideInInspector] public Vector3 LastPosition;
+    [HideInInspector] public List<Vector3> CollidingPoints { get; private set; }
+    [HideInInspector] public Vector3 DeltaPosition { get; private set; }
+    [HideInInspector] public Vector3 LastPosition { get; private set; }
 
     private NucleonManager NucleonManager;
-    private List<Vector3> CollidingPoints = new List<Vector3>();
 
     void Awake()
     {
@@ -26,12 +28,12 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
         CubeModel.UpdateBounds(transform, Position, Scale);
 
         ActiveCollisions = new List<NucleonCollider>();
-        NucleonManager = FindObjectOfType<NucleonManager>();
+        CollidingPoints = new List<Vector3>();
 
-        InvokeRepeating("UpdateCollisions", 0.0f, 0.01f);
+        NucleonManager = FindObjectOfType<NucleonManager>();
     }
 
-    void UpdateCollisions()
+    void Update()
     {
         CubeModel.UpdateBounds(transform, Position, Scale);
         Colliding = ActiveCollisions.Count > 0;
@@ -43,29 +45,31 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
 
     public void FetchCollisions()
     {
-        List<Vector3> CollidingPointsFetchList = new List<Vector3>();
-
         foreach (NucleonBoxCollider BoxCollider in NucleonManager.Colliders)
         {
             if(BoxCollider != this)
             {
                 bool Colliding = NucleonIntersector.CC_I(CubeModel, BoxCollider.CubeModel);
                 CollisionCheck(Colliding, BoxCollider);
-
-                if (Colliding)
+                
+                if (Colliding && DebugCollisionPoints)
                 {
-                    foreach (Vector3 Verticie in CubeModel.Vertices)
+                    List<Vector3> CollidingPointsFetchList = new List<Vector3>();
+                    foreach (Vector3 Vertice in CubeModel.Vertices)
                     {
-                        if(NucleonIntersector.PC_I(Verticie, BoxCollider.CubeModel))
+                        if (NucleonIntersector.PC_I(Vertice, BoxCollider.CubeModel))
                         {
-                            CollidingPointsFetchList.Add(Verticie);
+                            CollidingPointsFetchList.Add(Vertice);
                         }
                     }
+                    CollidingPoints = CollidingPointsFetchList;
+                }
+                if (!Colliding && DebugCollisionPoints)
+                {
+                    CollidingPoints = new List<Vector3>();
                 }
             }
         }
-
-        CollidingPoints = CollidingPointsFetchList;
     }
 
     private void CollisionCheck(bool Colliding, NucleonBoxCollider BoxCollider)
@@ -113,11 +117,20 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
                     transform.localScale.y + Scale.y, 
                     transform.localScale.z + Scale.z)
                 );
-
-            Gizmos.color = Color.blue;
-            foreach (Vector3 Point in CollidingPoints)
+            
+            if (DebugCollisionPoints)
             {
-                Gizmos.DrawSphere(Point, 0.1f);
+                Gizmos.color = Color.blue;
+                foreach (Vector3 Point in CollidingPoints)
+                {
+                    Gizmos.DrawSphere(Point, 0.1f);
+                }
+            }
+
+            if (DebugCenterOfGravity)
+            {
+                Gizmos.color = Color.black;
+                Gizmos.DrawSphere(transform.position, 0.1f);
             }
         }
         catch{}
