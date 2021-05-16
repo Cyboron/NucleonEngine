@@ -2,9 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NucleonCollisionExit
+namespace NucleonEngine.Collections
 {
-    public NucleonBoxCollider SelfCollider;
-    public NucleonBoxCollider OtherCollider;
-    public Vector3 ExitDirection;
+    public class NucleonCollisionExit
+    {
+        public NucleonBoxCollider SelfCollider;
+        public NucleonBoxCollider OtherCollider;
+        public Vector3 ExitDirection;
+    }
 }

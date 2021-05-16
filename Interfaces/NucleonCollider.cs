@@ -1,4 +1,7 @@
-public interface NucleonCollider 
+namespace NucleonEngine.Interfaces
 {
-    public void FetchCollisions();
+    public interface NucleonCollider
+    {
+        public void FetchCollisions();
+    }
 }
