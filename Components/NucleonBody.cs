@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class NucleonBody : MonoBehaviour
 {
+    [Header("General Settings")]
+    public NucleonBodyType BodyType;
+
     [Header("Physical Settings")]
     public float Mass;
     public float GravityScale;
@@ -49,25 +52,7 @@ public class NucleonBody : MonoBehaviour
         bool[] FacesArray = {Collision.TouchingMinX, Collision.TouchingMaxX, Collision.TouchingMinY, Collision.TouchingMaxY, Collision.TouchingMinZ, Collision.TouchingMaxZ};
         TouchingFaces[Collision.OtherCollider.GetInstanceID()] = FacesArray;
 
-        Vector3 DetunneledPosition = new Vector3(0, 0, 0);
-        if (FacesArray[0] && Collision.SelfCollider.DeltaPosition.x != 0)
-        {
-            DetunneledPosition.x = Collision.SelfCollider.CubeModel.MaxX - Collision.OtherCollider.CubeModel.MinX;
-        }
-        if (FacesArray[1] && Collision.SelfCollider.DeltaPosition.x != 0)
-        {
-            DetunneledPosition.x = Collision.SelfCollider.CubeModel.MinX - Collision.OtherCollider.CubeModel.MaxX;
-        }
-
-        if (FacesArray[4] && Collision.SelfCollider.DeltaPosition.z != 0)
-        {
-            DetunneledPosition.z = Collision.SelfCollider.CubeModel.MaxZ - Collision.OtherCollider.CubeModel.MinZ;
-        }
-        if (FacesArray[5] && Collision.SelfCollider.DeltaPosition.z != 0)
-        {
-            DetunneledPosition.z = Collision.SelfCollider.CubeModel.MinZ - Collision.OtherCollider.CubeModel.MaxZ;
-        }
-        transform.position = new Vector3(transform.position.x - DetunneledPosition.x, transform.position.y, transform.position.z - DetunneledPosition.z);
+        transform.position = PrepareDetunnel(FacesArray, Collision);
 
         if (Collision.CollisionDirection.y < 0 && !FacesArray[0] && !FacesArray[1] && !FacesArray[4] && !FacesArray[5])
         {
@@ -94,12 +79,6 @@ public class NucleonBody : MonoBehaviour
         }
     }
 
-    public void AddForce(float Force, Vector3 Direction)
-    {
-        float Acceleration = Force / Mass;
-        CalculationVelocity += new Vector3(Direction.x * Acceleration, Direction.y * Acceleration, Direction.z * Acceleration);
-    }
-
     private void PrepareVelocity()
     {
         AbsoluteVelocity = CalculationVelocity + Velocity;
@@ -108,26 +87,55 @@ public class NucleonBody : MonoBehaviour
         {
             if(CollisionSide.Value[0] == true && AbsoluteVelocity.x > 0)
             {
-                AbsoluteVelocity.x = 0;
+                AbsoluteVelocity.x = BodyType == 0 ? 0 : 0;
             }
             if (CollisionSide.Value[1] == true && AbsoluteVelocity.x < 0)
             {
-                AbsoluteVelocity.x = 0;
+                AbsoluteVelocity.x = BodyType == 0 ? 0 : 0;
             }
 
             if (CollisionSide.Value[2] == true && AbsoluteVelocity.y > 0)
             {
-                AbsoluteVelocity.y = 0;
+                AbsoluteVelocity.y = BodyType == 0 ? 0 : 0;
             }
 
             if (CollisionSide.Value[4] == true && AbsoluteVelocity.z > 0)
             {
-                AbsoluteVelocity.z = 0;
+                AbsoluteVelocity.z = BodyType == 0 ? 0 : 0;
             }
             if (CollisionSide.Value[5] == true && AbsoluteVelocity.z < 0)
             {
-                AbsoluteVelocity.z = 0;
+                AbsoluteVelocity.z = BodyType == 0 ? 0 : 0;
             }
         }
+    }
+
+    private Vector3 PrepareDetunnel(bool[] FacesArray, NucleonCollision Collision)
+    {
+        Vector3 DetunneledPosition = new Vector3(0, 0, 0);
+        if (FacesArray[0] && Collision.SelfCollider.DeltaPosition.x != 0)
+        {
+            DetunneledPosition.x = Collision.SelfCollider.CubeModel.MaxX - Collision.OtherCollider.CubeModel.MinX;
+        }
+        if (FacesArray[1] && Collision.SelfCollider.DeltaPosition.x != 0)
+        {
+            DetunneledPosition.x = Collision.SelfCollider.CubeModel.MinX - Collision.OtherCollider.CubeModel.MaxX;
+        }
+
+        if (FacesArray[4] && Collision.SelfCollider.DeltaPosition.z != 0)
+        {
+            DetunneledPosition.z = Collision.SelfCollider.CubeModel.MaxZ - Collision.OtherCollider.CubeModel.MinZ;
+        }
+        if (FacesArray[5] && Collision.SelfCollider.DeltaPosition.z != 0)
+        {
+            DetunneledPosition.z = Collision.SelfCollider.CubeModel.MinZ - Collision.OtherCollider.CubeModel.MaxZ;
+        }
+        return new Vector3(transform.position.x - DetunneledPosition.x, transform.position.y, transform.position.z - DetunneledPosition.z);
+    }
+
+    public void AddForce(float Force, Vector3 Direction)
+    {
+        float Acceleration = Force / Mass;
+        CalculationVelocity += new Vector3(Direction.x * Acceleration, Direction.y * Acceleration, Direction.z * Acceleration);
     }
 }

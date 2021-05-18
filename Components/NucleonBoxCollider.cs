@@ -10,7 +10,6 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
 {
     [Header("General Settings")]
     public bool Trigger;
-    public NucleonBody Body;
     public NucleonMaterial NucleonMaterial;
 
     [Header("Collider Customization")]
@@ -23,17 +22,26 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
     [Header("Debug Settings")]
     public bool DebugCollisionVertices;
     public bool DebugCenterOfGravity;
-    
+
+    public NucleonBody Body { get; private set; }
     public CubeModel CubeModel { get; private set; }
     public bool Colliding { get; private set; }
     public List<NucleonCollider> ActiveCollisions { get; private set; }
     public List<Vector3> CollidingPoints { get; private set; }
     public Vector3 DeltaPosition { get; private set; }
     public Vector3 LastPosition { get; private set; }
-    public Vector3 Test;
 
     private NucleonManager NucleonManager;
     private CubeModel CollisionPartner;
+
+    void Awake()
+    {
+        try
+        {
+            Body = GetComponent<NucleonBody>();
+        }
+        catch { }
+    }
 
     void Start()
     {
@@ -103,7 +111,7 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
             
             Collision.TouchingMinZ = CubeModel.MaxZ >= BoxCollider.CubeModel.MinZ && CubeModel.MaxZ <= BoxCollider.CubeModel.MinZ + 0.1f;
             Collision.TouchingMaxZ = CubeModel.MinZ <= BoxCollider.CubeModel.MaxZ && CubeModel.MinZ >= BoxCollider.CubeModel.MaxZ - 0.1f;
-
+            
             if (!ActiveCollisions.Contains(BoxCollider))
             {
                 ActiveCollisions.Add(BoxCollider);
