@@ -22,7 +22,6 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
 
     [Header("Debug Settings")]
     public bool DebugCollisionVertices;
-    public bool DebugCollisionPoints;
     public bool DebugCenterOfGravity;
     
     public CubeModel CubeModel { get; private set; }
@@ -82,15 +81,6 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
                 if (!Colliding && DebugCollisionVertices)
                 {
                     CollidingPoints = new List<Vector3>();
-                }
-
-                if (Colliding && DebugCollisionPoints)
-                {
-                    CollisionPartner = BoxCollider.CubeModel;
-                }
-                if (!Colliding && DebugCollisionPoints)
-                {
-                    CollisionPartner = null;
                 }
             }
         }
@@ -157,14 +147,6 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
                 foreach (Vector3 Point in CollidingPoints)
                 {
                     Gizmos.DrawSphere(Point, 0.1f);
-                }
-            }
-
-            if (DebugCollisionPoints)
-            {
-                if (CollisionPartner != null )
-                {
-                    Gizmos.DrawSphere(new Vector3(0, 0, 0), 0.1f);
                 }
             }
 
