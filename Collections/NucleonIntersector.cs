@@ -11,6 +11,8 @@ namespace NucleonEngine.Collections
          * I = Intersect
         */
 
+        // Main Collision Checks
+
         public static bool PC_I(Vector3 Point, CubeModel Cube)
         {
             return (Point.x >= Cube.MinX && Point.x <= Cube.MaxX) &&

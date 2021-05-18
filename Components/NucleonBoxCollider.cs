@@ -21,6 +21,7 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
     public float CollisionOverlapThreshold = 0.001f;
 
     [Header("Debug Settings")]
+    public bool DebugCollisionVertices;
     public bool DebugCollisionPoints;
     public bool DebugCenterOfGravity;
     
@@ -30,10 +31,12 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
     public List<Vector3> CollidingPoints { get; private set; }
     public Vector3 DeltaPosition { get; private set; }
     public Vector3 LastPosition { get; private set; }
+    public Vector3 Test;
 
     private NucleonManager NucleonManager;
+    private CubeModel CollisionPartner;
 
-    void Awake()
+    void Start()
     {
         CubeModel = new CubeModel();
         CubeModel.UpdateBounds(transform, Position, Scale);
@@ -64,7 +67,7 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
                 bool Colliding = NucleonIntersector.CC_I(CubeModel, BoxCollider.CubeModel);
                 CollisionCheck(Colliding, BoxCollider);
                 
-                if (Colliding && DebugCollisionPoints)
+                if (Colliding && DebugCollisionVertices)
                 {
                     List<Vector3> CollidingPointsFetchList = new List<Vector3>();
                     foreach (Vector3 Vertice in CubeModel.Vertices)
@@ -76,9 +79,18 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
                     }
                     CollidingPoints = CollidingPointsFetchList;
                 }
-                if (!Colliding && DebugCollisionPoints)
+                if (!Colliding && DebugCollisionVertices)
                 {
                     CollidingPoints = new List<Vector3>();
+                }
+
+                if (Colliding && DebugCollisionPoints)
+                {
+                    CollisionPartner = BoxCollider.CubeModel;
+                }
+                if (!Colliding && DebugCollisionPoints)
+                {
+                    CollisionPartner = null;
                 }
             }
         }
@@ -92,6 +104,15 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
             Collision.SelfCollider = this;
             Collision.OtherCollider = BoxCollider;
             Collision.CollisionDirection = DeltaPosition;
+            
+            Collision.TouchingMinX = CubeModel.MaxX >= BoxCollider.CubeModel.MinX && CubeModel.MaxX <= BoxCollider.CubeModel.MinX + 0.1f;
+            Collision.TouchingMaxX = CubeModel.MinX <= BoxCollider.CubeModel.MaxX && CubeModel.MinX >= BoxCollider.CubeModel.MaxX - 0.1f;
+            
+            Collision.TouchingMinY = CubeModel.MaxY >= BoxCollider.CubeModel.MinY && CubeModel.MaxY <= BoxCollider.CubeModel.MinY + 0.1f;
+            Collision.TouchingMaxY = CubeModel.MinY <= BoxCollider.CubeModel.MaxY && CubeModel.MinY >= BoxCollider.CubeModel.MaxY - 0.5f;
+            
+            Collision.TouchingMinZ = CubeModel.MaxZ >= BoxCollider.CubeModel.MinZ && CubeModel.MaxZ <= BoxCollider.CubeModel.MinZ + 0.1f;
+            Collision.TouchingMaxZ = CubeModel.MinZ <= BoxCollider.CubeModel.MaxZ && CubeModel.MinZ >= BoxCollider.CubeModel.MaxZ - 0.1f;
 
             if (!ActiveCollisions.Contains(BoxCollider))
             {
@@ -130,12 +151,20 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
                     transform.localScale.z + Scale.z)
                 );
             
-            if (DebugCollisionPoints)
+            if (DebugCollisionVertices)
             {
                 Gizmos.color = Color.blue;
                 foreach (Vector3 Point in CollidingPoints)
                 {
                     Gizmos.DrawSphere(Point, 0.1f);
+                }
+            }
+
+            if (DebugCollisionPoints)
+            {
+                if (CollisionPartner != null )
+                {
+                    Gizmos.DrawSphere(new Vector3(0, 0, 0), 0.1f);
                 }
             }
 
