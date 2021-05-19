@@ -9,7 +9,6 @@ namespace NucleonEngine.Collisions
     {
         [Header("General Settings")]
         public bool Trigger;
-        public NucleonMaterial NucleonMaterial;
 
         [Header("Collider Customization")]
         public Vector3 Position;
