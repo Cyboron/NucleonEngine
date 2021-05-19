@@ -1,10 +1,8 @@
-using NucleonEngine.Calculations;
-using NucleonEngine.Models;
-using UnityEngine;
+using NucleonEngine.Collisions;
 
-namespace NucleonEngine.Collections
+namespace NucleonEngine.Calculations
 {
-    public static class NucleonIntersector
+    public static class intersector
     {
         /*
          * P = Point

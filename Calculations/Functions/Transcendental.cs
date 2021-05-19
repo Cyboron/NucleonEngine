@@ -1,4 +1,4 @@
-﻿namespace NucleonEngine.Calculations
+﻿namespace NucleonEngine.Calculations.Functions
 {
     public static partial class libm
     {

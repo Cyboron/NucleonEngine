@@ -1,7 +1,7 @@
 using NucleonEngine.Calculations;
 using UnityEngine;
 
-namespace NucleonEngine.Models
+namespace NucleonEngine.Collisions
 {
     public class CubeModel
     {

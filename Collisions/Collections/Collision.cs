@@ -1,15 +1,11 @@
 using NucleonEngine.Calculations;
-using NucleonEngine.Models;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
-namespace NucleonEngine.Collections
+namespace NucleonEngine.Collisions
 {
-    public class NucleonCollision
+    public class Collision
     {
-        public NucleonBoxCollider SelfCollider;
-        public NucleonBoxCollider OtherCollider;
+        public BoxCollider SelfCollider;
+        public BoxCollider OtherCollider;
         public svector3 CollisionDirection;
         public sfloat ImpactForce;
 
