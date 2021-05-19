@@ -1,3 +1,4 @@
+using NucleonEngine.Calculations;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,6 @@ namespace NucleonEngine.Collections
     {
         public NucleonBoxCollider SelfCollider;
         public NucleonBoxCollider OtherCollider;
-        public Vector3 ExitDirection;
+        public svector3 ExitDirection;
     }
 }

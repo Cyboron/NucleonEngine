@@ -1,3 +1,4 @@
+using NucleonEngine.Calculations;
 using NucleonEngine.Models;
 using UnityEngine;
 
@@ -13,7 +14,7 @@ namespace NucleonEngine.Collections
 
         // Main Collision Checks
 
-        public static bool PC_I(Vector3 Point, CubeModel Cube)
+        public static bool PC_I(svector3 Point, CubeModel Cube)
         {
             return (Point.x >= Cube.MinX && Point.x <= Cube.MaxX) &&
                    (Point.y >= Cube.MinY && Point.y <= Cube.MaxY) &&

@@ -9,71 +9,18 @@ namespace NucleonEngine.Calculations
         public sfloat z = (sfloat)0;
         private sfloat hash = (sfloat)0;
 
-        public svector3(object x, object y, object z)
+        public svector3(sfloat x, sfloat y, sfloat z)
         {
-            if (x is sfloat)
-            {
-                sfloat _x = (sfloat)x;
-                this.x = (sfloat)_x;
-            }
-            if (y is sfloat)
-            {
-                sfloat _y = (sfloat)y;
-                this.y = (sfloat)_y;
-            }
-            if (z is sfloat)
-            {
-                sfloat _z = (sfloat)z;
-                this.z = (sfloat)_z;
-            }
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
 
-            if (x is int)
-            {
-                int _x = (int)x;
-                this.x = (sfloat)_x;
-            }
-            if (y is int)
-            {
-                int _y = (int)y;
-                this.y = (sfloat)_y;
-            }
-            if (z is int)
-            {
-                int _z = (int)z;
-                this.z = (sfloat)_z;
-            }
-
-            if (x is float)
-            {
-                float _x = (float)x;
-                this.x = (sfloat)_x;
-            }
-            if (y is float)
-            {
-                float _y = (float)y;
-                this.y = (sfloat)_y;
-            }
-            if (z is float)
-            {
-                float _z = (float)z;
-                this.z = (sfloat)_z;
-            }
-
-            if (x is double)
-            {
-                double _x = (double)x;
-                this.x = (sfloat)_x;
-            }
-            if (y is double)
-            {
-                double _y = (double)y;
-                this.y = (sfloat)_y;
-            }
-            if (z is double)
-            {
-                double _z = (double)z;
-                this.z = (sfloat)_z;
-            }
+        public svector3(int x, int y, int z)
+        {
+            this.x = (sfloat)x;
+            this.y = (sfloat)y;
+            this.z = (sfloat)z;
         }
 
         public static svector3 Zero()

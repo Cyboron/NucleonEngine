@@ -1,3 +1,4 @@
+using NucleonEngine.Calculations;
 using NucleonEngine.Collections;
 using NucleonEngine.Interfaces;
 using NucleonEngine.Models;
@@ -27,15 +28,18 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
     public CubeModel CubeModel { get; private set; }
     public bool Colliding { get; private set; }
     public List<NucleonCollider> ActiveCollisions { get; private set; }
-    public List<Vector3> CollidingPoints { get; private set; }
-    public Vector3 DeltaPosition { get; private set; }
-    public Vector3 LastPosition { get; private set; }
+    public List<svector3> CollidingPoints { get; private set; }
+    public svector3 DeltaPosition { get; private set; }
+    public svector3 LastPosition { get; private set; }
 
     private NucleonManager NucleonManager;
     private CubeModel CollisionPartner;
 
     void Awake()
     {
+        DeltaPosition = svector3.Zero();
+        LastPosition = svector3.Zero();
+
         try
         {
             Body = GetComponent<NucleonBody>();
@@ -46,10 +50,10 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
     void Start()
     {
         CubeModel = new CubeModel();
-        CubeModel.UpdateBounds(transform, Position, Scale);
+        CubeModel.UpdateBounds(transform, (svector3)Position, (svector3)Scale);
 
         ActiveCollisions = new List<NucleonCollider>();
-        CollidingPoints = new List<Vector3>();
+        CollidingPoints = new List<svector3>();
 
         NucleonManager = NucleonManager.Instance;
         NucleonManager.RegisterCollider(this);
@@ -57,10 +61,10 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
 
     void Update()
     {
-        CubeModel.UpdateBounds(transform, Position, Scale);
+        CubeModel.UpdateBounds(transform, (svector3)Position, (svector3)Scale);
         Colliding = ActiveCollisions.Count > 0;
-        DeltaPosition = (transform.position + Position) - LastPosition;
-        LastPosition = (transform.position + Position);
+        DeltaPosition = ((svector3)transform.position + (svector3)Position) - LastPosition;
+        LastPosition = ((svector3)transform.position + (svector3)Position);
 
         FetchCollisions();
     }
@@ -76,8 +80,8 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
                 
                 if (Colliding && DebugCollisionVertices)
                 {
-                    List<Vector3> CollidingPointsFetchList = new List<Vector3>();
-                    foreach (Vector3 Vertice in CubeModel.Vertices)
+                    List<svector3> CollidingPointsFetchList = new List<svector3>();
+                    foreach (svector3 Vertice in CubeModel.Vertices)
                     {
                         if (NucleonIntersector.PC_I(Vertice, BoxCollider.CubeModel))
                         {
@@ -88,7 +92,7 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
                 }
                 if (!Colliding && DebugCollisionVertices)
                 {
-                    CollidingPoints = new List<Vector3>();
+                    CollidingPoints = new List<svector3>();
                 }
             }
         }
@@ -103,14 +107,14 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
             Collision.OtherCollider = BoxCollider;
             Collision.CollisionDirection = DeltaPosition;
             
-            Collision.TouchingMinX = CubeModel.MaxX >= BoxCollider.CubeModel.MinX && CubeModel.MaxX <= BoxCollider.CubeModel.MinX + 0.1f;
-            Collision.TouchingMaxX = CubeModel.MinX <= BoxCollider.CubeModel.MaxX && CubeModel.MinX >= BoxCollider.CubeModel.MaxX - 0.1f;
+            Collision.TouchingMinX = CubeModel.MaxX >= BoxCollider.CubeModel.MinX && CubeModel.MaxX <= BoxCollider.CubeModel.MinX + (sfloat)0.1f;
+            Collision.TouchingMaxX = CubeModel.MinX <= BoxCollider.CubeModel.MaxX && CubeModel.MinX >= BoxCollider.CubeModel.MaxX - (sfloat)0.1f;
             
-            Collision.TouchingMinY = CubeModel.MaxY >= BoxCollider.CubeModel.MinY && CubeModel.MaxY <= BoxCollider.CubeModel.MinY + 0.1f;
-            Collision.TouchingMaxY = CubeModel.MinY <= BoxCollider.CubeModel.MaxY && CubeModel.MinY >= BoxCollider.CubeModel.MaxY - 0.5f;
+            Collision.TouchingMinY = CubeModel.MaxY >= BoxCollider.CubeModel.MinY && CubeModel.MaxY <= BoxCollider.CubeModel.MinY + (sfloat)0.1f;
+            Collision.TouchingMaxY = CubeModel.MinY <= BoxCollider.CubeModel.MaxY && CubeModel.MinY >= BoxCollider.CubeModel.MaxY - (sfloat)0.5f;
             
-            Collision.TouchingMinZ = CubeModel.MaxZ >= BoxCollider.CubeModel.MinZ && CubeModel.MaxZ <= BoxCollider.CubeModel.MinZ + 0.1f;
-            Collision.TouchingMaxZ = CubeModel.MinZ <= BoxCollider.CubeModel.MaxZ && CubeModel.MinZ >= BoxCollider.CubeModel.MaxZ - 0.1f;
+            Collision.TouchingMinZ = CubeModel.MaxZ >= BoxCollider.CubeModel.MinZ && CubeModel.MaxZ <= BoxCollider.CubeModel.MinZ + (sfloat)0.1f;
+            Collision.TouchingMaxZ = CubeModel.MinZ <= BoxCollider.CubeModel.MaxZ && CubeModel.MinZ >= BoxCollider.CubeModel.MaxZ - (sfloat)0.1f;
             
             if (!ActiveCollisions.Contains(BoxCollider))
             {
@@ -152,9 +156,9 @@ public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
             if (DebugCollisionVertices)
             {
                 Gizmos.color = Color.blue;
-                foreach (Vector3 Point in CollidingPoints)
+                foreach (svector3 Point in CollidingPoints)
                 {
-                    Gizmos.DrawSphere(Point, 0.1f);
+                    Gizmos.DrawSphere((Vector3)Point, 0.1f);
                 }
             }
 

@@ -1,3 +1,4 @@
+using NucleonEngine.Calculations;
 using NucleonEngine.Models;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,8 +10,8 @@ namespace NucleonEngine.Collections
     {
         public NucleonBoxCollider SelfCollider;
         public NucleonBoxCollider OtherCollider;
-        public Vector3 CollisionDirection;
-        public float ImpactForce;
+        public svector3 CollisionDirection;
+        public sfloat ImpactForce;
 
         public bool TouchingMinX;
         public bool TouchingMaxX;

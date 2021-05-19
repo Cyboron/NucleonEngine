@@ -1,3 +1,4 @@
+using NucleonEngine.Calculations;
 using NucleonEngine.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,17 +9,17 @@ public class NucleonBody : MonoBehaviour
     public NucleonBodyType BodyType;
 
     [Header("Physical Settings")]
-    public float Mass;
-    public float GravityScale;
+    public float Mass = 1;
+    public float GravityScale = 1;
 
-    [HideInInspector] public Vector3 Velocity;
+    [HideInInspector] public svector3 Velocity = svector3.Zero();
 
-    public Vector3 AbsoluteVelocity;
+    [HideInInspector] public svector3 AbsoluteVelocity = svector3.Zero();
     public bool Grounded { get; private set; }
     public NucleonBoxCollider Ground { get; private set; }
 
     private Vector3 CalculationVelocity;
-    private float GravityTimer;
+    private sfloat GravityTimer;
 
     private Dictionary<int, bool[]> TouchingFaces = new Dictionary<int, bool[]>();
 
@@ -29,18 +30,18 @@ public class NucleonBody : MonoBehaviour
 
     void Update()
     {
-        GravityTimer += Time.deltaTime;
+        GravityTimer = GravityTimer + (sfloat)Time.deltaTime;
     }
 
     void FixedUpdate()
     {
         if (!Grounded)
         {
-            CalculationVelocity.y += -GravityScale * GravityTimer;
+            CalculationVelocity.y += (float)(-(sfloat)GravityScale * GravityTimer);
         }
 
         PrepareVelocity();
-        transform.position += AbsoluteVelocity * Time.fixedDeltaTime;
+        transform.position += (Vector3)(AbsoluteVelocity * (sfloat)Time.fixedDeltaTime);
     }
 
     public void OnNucleonCollisionEnter(NucleonCollision Collision)
@@ -52,18 +53,18 @@ public class NucleonBody : MonoBehaviour
         bool[] FacesArray = {Collision.TouchingMinX, Collision.TouchingMaxX, Collision.TouchingMinY, Collision.TouchingMaxY, Collision.TouchingMinZ, Collision.TouchingMaxZ};
         TouchingFaces[Collision.OtherCollider.GetInstanceID()] = FacesArray;
 
-        transform.position = PrepareDetunnel(FacesArray, Collision);
+        transform.position = (Vector3)PrepareDetunnel(FacesArray, Collision);
 
-        if (Collision.CollisionDirection.y < 0 && !FacesArray[0] && !FacesArray[1] && !FacesArray[4] && !FacesArray[5])
+        if (Collision.CollisionDirection.y < (sfloat)0 && !FacesArray[0] && !FacesArray[1] && !FacesArray[4] && !FacesArray[5])
         {
             Grounded = true;
             Ground = Collision.OtherCollider;
             CalculationVelocity.y = 0;
-            GravityTimer = 0;
-            transform.position = new Vector3(
-                transform.position.x + Collision.SelfCollider.Position.x, 
-                ((transform.localScale.y + Collision.SelfCollider.Scale.y) / 2) + Collision.OtherCollider.CubeModel.MaxY - Collision.SelfCollider.CollisionOverlapThreshold - Collision.SelfCollider.Position.y, 
-                transform.position.z + Collision.SelfCollider.Position.z);
+            GravityTimer = (sfloat)0;
+            transform.position = (Vector3)new svector3(
+                (sfloat)transform.position.x, 
+                (((sfloat)transform.localScale.y + (sfloat)Collision.SelfCollider.Scale.y) / (sfloat)2) + Collision.OtherCollider.CubeModel.MaxY - (sfloat)Collision.SelfCollider.CollisionOverlapThreshold - (sfloat)Collision.SelfCollider.Position.y,
+                (sfloat)transform.position.z);
         }
     }
 
@@ -75,67 +76,67 @@ public class NucleonBody : MonoBehaviour
         {
             Grounded = false;
             Ground = null;
-            GravityTimer = 0;
+            GravityTimer = (sfloat)0;
         }
     }
 
     private void PrepareVelocity()
     {
-        AbsoluteVelocity = CalculationVelocity + Velocity;
+        AbsoluteVelocity = (svector3)CalculationVelocity + Velocity;
 
         foreach(var CollisionSide in TouchingFaces)
         {
-            if(CollisionSide.Value[0] == true && AbsoluteVelocity.x > 0)
+            if(CollisionSide.Value[0] == true && AbsoluteVelocity.x > (sfloat)0)
             {
-                AbsoluteVelocity.x = BodyType == 0 ? 0 : 0;
+                AbsoluteVelocity.x = BodyType == 0 ? (sfloat)0 : (sfloat)0;
             }
-            if (CollisionSide.Value[1] == true && AbsoluteVelocity.x < 0)
+            if (CollisionSide.Value[1] == true && AbsoluteVelocity.x < (sfloat)0)
             {
-                AbsoluteVelocity.x = BodyType == 0 ? 0 : 0;
-            }
-
-            if (CollisionSide.Value[2] == true && AbsoluteVelocity.y > 0)
-            {
-                AbsoluteVelocity.y = BodyType == 0 ? 0 : 0;
+                AbsoluteVelocity.x = BodyType == 0 ? (sfloat)0 : (sfloat)0;
             }
 
-            if (CollisionSide.Value[4] == true && AbsoluteVelocity.z > 0)
+            if (CollisionSide.Value[2] == true && AbsoluteVelocity.y > (sfloat)0)
             {
-                AbsoluteVelocity.z = BodyType == 0 ? 0 : 0;
+                AbsoluteVelocity.y = BodyType == 0 ? (sfloat)0 : (sfloat)0;
             }
-            if (CollisionSide.Value[5] == true && AbsoluteVelocity.z < 0)
+
+            if (CollisionSide.Value[4] == true && AbsoluteVelocity.z > (sfloat)0)
             {
-                AbsoluteVelocity.z = BodyType == 0 ? 0 : 0;
+                AbsoluteVelocity.z = BodyType == 0 ? (sfloat)0 : (sfloat)0;
+            }
+            if (CollisionSide.Value[5] == true && AbsoluteVelocity.z < (sfloat)0)
+            {
+                AbsoluteVelocity.z = BodyType == 0 ? (sfloat)0 : (sfloat)0;
             }
         }
     }
 
-    private Vector3 PrepareDetunnel(bool[] FacesArray, NucleonCollision Collision)
+    private svector3 PrepareDetunnel(bool[] FacesArray, NucleonCollision Collision)
     {
-        Vector3 DetunneledPosition = new Vector3(0, 0, 0);
-        if (FacesArray[0] && Collision.SelfCollider.DeltaPosition.x != 0)
+        svector3 DetunneledPosition = new svector3(0, 0, 0);
+        if (FacesArray[0] && Collision.SelfCollider.DeltaPosition.x != (sfloat)0)
         {
             DetunneledPosition.x = Collision.SelfCollider.CubeModel.MaxX - Collision.OtherCollider.CubeModel.MinX;
         }
-        if (FacesArray[1] && Collision.SelfCollider.DeltaPosition.x != 0)
+        if (FacesArray[1] && Collision.SelfCollider.DeltaPosition.x != (sfloat)0)
         {
             DetunneledPosition.x = Collision.SelfCollider.CubeModel.MinX - Collision.OtherCollider.CubeModel.MaxX;
         }
 
-        if (FacesArray[4] && Collision.SelfCollider.DeltaPosition.z != 0)
+        if (FacesArray[4] && Collision.SelfCollider.DeltaPosition.z != (sfloat)0)
         {
             DetunneledPosition.z = Collision.SelfCollider.CubeModel.MaxZ - Collision.OtherCollider.CubeModel.MinZ;
         }
-        if (FacesArray[5] && Collision.SelfCollider.DeltaPosition.z != 0)
+        if (FacesArray[5] && Collision.SelfCollider.DeltaPosition.z != (sfloat)0)
         {
             DetunneledPosition.z = Collision.SelfCollider.CubeModel.MinZ - Collision.OtherCollider.CubeModel.MaxZ;
         }
-        return new Vector3(transform.position.x - DetunneledPosition.x, transform.position.y, transform.position.z - DetunneledPosition.z);
+        return new svector3((sfloat)transform.position.x - DetunneledPosition.x, (sfloat)transform.position.y, (sfloat)transform.position.z - DetunneledPosition.z);
     }
 
-    public void AddForce(float Force, Vector3 Direction)
+    public void AddForce(sfloat Force, svector3 Direction)
     {
-        float Acceleration = Force / Mass;
-        CalculationVelocity += new Vector3(Direction.x * Acceleration, Direction.y * Acceleration, Direction.z * Acceleration);
+        sfloat Acceleration = Force / (sfloat)Mass;
+        CalculationVelocity += (Vector3)new svector3(Direction.x * Acceleration, Direction.y * Acceleration, Direction.z * Acceleration);
     }
 }
