@@ -5,10 +5,10 @@ using UnityEngine;
 
 namespace NucleonEngine.Dynamics
 {
-    public class PhysicsBody : MonoBehaviour
+    public class NucleonRigidbody : MonoBehaviour
     {
         [Header("General Settings")]
-        public PhysicsBodyType BodyType;
+        public NucleonRigidbodyType BodyType;
 
         [Header("Physical Settings")]
         public float Mass = 1;
@@ -18,7 +18,7 @@ namespace NucleonEngine.Dynamics
 
         [HideInInspector] public svector3 AbsoluteVelocity = svector3.Zero();
         public bool Grounded { get; private set; }
-        public Collisions.BoxCollider Ground { get; private set; }
+        public NucleonBoxCollider Ground { get; private set; }
 
         private Vector3 CalculationVelocity;
         private sfloat GravityTimer;
@@ -46,7 +46,7 @@ namespace NucleonEngine.Dynamics
             transform.position += (Vector3)(AbsoluteVelocity * (sfloat)Time.fixedDeltaTime);
         }
 
-        public void OnNucleonCollisionEnter(Collisions.Collision Collision)
+        public void OnNucleonCollisionEnter(NucleonCollision Collision)
         {
             if (!TouchingFaces.ContainsKey(Collision.OtherCollider.GetInstanceID()))
             {
@@ -70,7 +70,7 @@ namespace NucleonEngine.Dynamics
             }
         }
 
-        public void OnNucleonCollisionExit(CollisionExit CollisionExit)
+        public void OnNucleonCollisionExit(NucleonCollisionExit CollisionExit)
         {
             TouchingFaces.Remove(CollisionExit.OtherCollider.GetInstanceID());
 
@@ -113,7 +113,7 @@ namespace NucleonEngine.Dynamics
             }
         }
 
-        private svector3 PrepareDetunnel(bool[] FacesArray, Collisions.Collision Collision)
+        private svector3 PrepareDetunnel(bool[] FacesArray, NucleonCollision Collision)
         {
             svector3 DetunneledPosition = new svector3(0, 0, 0);
             if (FacesArray[0] && Collision.SelfCollider.DeltaPosition.x != (sfloat)0)

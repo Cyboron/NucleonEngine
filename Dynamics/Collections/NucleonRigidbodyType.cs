@@ -1,6 +1,6 @@
 namespace NucleonEngine.Dynamics
 {
-    public enum PhysicsBodyType
+    public enum NucleonRigidbodyType
     {
         Dynamic,
         Static

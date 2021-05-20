@@ -1,6 +1,6 @@
 namespace NucleonEngine.Collisions
 {
-    public interface Collider
+    public interface NucleonCollider
     {
         public void FetchCollisions();
     }

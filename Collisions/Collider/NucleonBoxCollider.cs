@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace NucleonEngine.Collisions
 {
-    public class BoxCollider : MonoBehaviour, Collider
+    public class NucleonBoxCollider : MonoBehaviour, NucleonCollider
     {
         [Header("General Settings")]
         public bool Trigger;
@@ -21,15 +21,15 @@ namespace NucleonEngine.Collisions
         public bool DebugCollisionVertices;
         public bool DebugCenterOfGravity;
 
-        public PhysicsBody Body { get; private set; }
+        public NucleonRigidbody Body { get; private set; }
         public CubeModel CubeModel { get; private set; }
         public bool Colliding { get; private set; }
-        public List<Collider> ActiveCollisions { get; private set; }
+        public List<NucleonCollider> ActiveCollisions { get; private set; }
         public List<svector3> CollidingPoints { get; private set; }
         public svector3 DeltaPosition { get; private set; }
         public svector3 LastPosition { get; private set; }
 
-        private PhysicsManager PhysicsManager;
+        private NucleonManager NucleonManager;
         private CubeModel CollisionPartner;
 
         void Awake()
@@ -39,7 +39,7 @@ namespace NucleonEngine.Collisions
 
             try
             {
-                Body = GetComponent<PhysicsBody>();
+                Body = GetComponent<NucleonRigidbody>();
             }
             catch { }
         }
@@ -49,11 +49,11 @@ namespace NucleonEngine.Collisions
             CubeModel = new CubeModel();
             CubeModel.UpdateBounds(transform, (svector3)Position, (svector3)Scale);
 
-            ActiveCollisions = new List<Collider>();
+            ActiveCollisions = new List<NucleonCollider>();
             CollidingPoints = new List<svector3>();
 
-            PhysicsManager = PhysicsManager.Instance;
-            PhysicsManager.RegisterCollider(this);
+            NucleonManager = NucleonManager.Instance;
+            NucleonManager.RegisterCollider(this);
         }
 
         void Update()
@@ -68,7 +68,7 @@ namespace NucleonEngine.Collisions
 
         public void FetchCollisions()
         {
-            foreach (BoxCollider BoxCollider in PhysicsManager.Colliders)
+            foreach (NucleonBoxCollider BoxCollider in NucleonManager.Colliders)
             {
                 if (BoxCollider != this)
                 {
@@ -95,11 +95,11 @@ namespace NucleonEngine.Collisions
             }
         }
 
-        private void CollisionCheck(bool Colliding, BoxCollider BoxCollider)
+        private void CollisionCheck(bool Colliding, NucleonBoxCollider BoxCollider)
         {
             if (Colliding)
             {
-                Collision Collision = new Collision();
+                NucleonCollision Collision = new NucleonCollision();
                 Collision.SelfCollider = this;
                 Collision.OtherCollider = BoxCollider;
                 Collision.CollisionDirection = DeltaPosition;
@@ -123,7 +123,7 @@ namespace NucleonEngine.Collisions
             {
                 if (ActiveCollisions.Contains(BoxCollider))
                 {
-                    CollisionExit CollisionExit = new CollisionExit();
+                    NucleonCollisionExit CollisionExit = new NucleonCollisionExit();
                     CollisionExit.SelfCollider = this;
                     CollisionExit.OtherCollider = BoxCollider;
                     CollisionExit.ExitDirection = DeltaPosition;

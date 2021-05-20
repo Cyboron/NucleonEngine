@@ -1,19 +1,20 @@
+using NucleonEngine.Collisions;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace NucleonEngine.Dynamics
 {
-    public class PhysicsManager : MonoBehaviour
+    public class NucleonManager : MonoBehaviour
     {
-        public static PhysicsManager Instance;
-        public List<Collisions.Collider> Colliders = new List<Collisions.Collider>();
+        public static NucleonManager Instance;
+        public List<NucleonCollider> Colliders = new List<NucleonCollider>();
 
         void Awake()
         {
             Instance = this;
         }
 
-        public void RegisterCollider(Collisions.Collider Collider)
+        public void RegisterCollider(NucleonCollider Collider)
         {
             if (!Colliders.Contains(Collider))
             {
@@ -21,7 +22,7 @@ namespace NucleonEngine.Dynamics
             }
         }
 
-        public void RemoveCollider(Collisions.Collider Collider)
+        public void RemoveCollider(NucleonCollider Collider)
         {
             if (Colliders.Contains(Collider))
             {

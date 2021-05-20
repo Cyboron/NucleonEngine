@@ -2,10 +2,10 @@ using NucleonEngine.Calculations;
 
 namespace NucleonEngine.Collisions
 {
-    public class Collision
+    public class NucleonCollision
     {
-        public BoxCollider SelfCollider;
-        public BoxCollider OtherCollider;
+        public NucleonBoxCollider SelfCollider;
+        public NucleonBoxCollider OtherCollider;
         public svector3 CollisionDirection;
         public sfloat ImpactForce;
 
