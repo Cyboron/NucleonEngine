@@ -1,0 +1,1 @@
+(self.webpackChunknucleon_docs=self.webpackChunknucleon_docs||[]).push([[685],{6353:function(e){"use strict";e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"Welcome","permalink":"/NucleonEngine/blog/welcome"},{"title":"Hello","permalink":"/NucleonEngine/blog/hello-world"},{"title":"Hola","permalink":"/NucleonEngine/blog/hola"}]}')}}]);

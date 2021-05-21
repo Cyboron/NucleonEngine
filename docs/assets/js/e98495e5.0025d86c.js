@@ -1,0 +1,1 @@
+(self.webpackChunknucleon_docs=self.webpackChunknucleon_docs||[]).push([[202],{741:function(n){"use strict";n.exports=JSON.parse('{"allTagsPath":"/NucleonEngine/blog/tags","slug":"hola","name":"hola","count":1,"permalink":"/NucleonEngine/blog/tags/hola"}')}}]);
