@@ -15,6 +15,7 @@ namespace NucleonEngine.Collisions
         public Vector3 Scale;
 
         [Header("Specific Settings")]
+        public float UpdatesPerSecond = 60;
         public float CollisionOverlapThreshold = 0.001f;
 
         [Header("Debug Settings")]
@@ -30,7 +31,8 @@ namespace NucleonEngine.Collisions
         public svector3 LastPosition { get; private set; }
 
         private NucleonManager NucleonManager;
-        private CubeModel CollisionPartner;
+        private sfloat UpdateInterval;
+        private sfloat ElapsedUpdateTime;
 
         void Awake()
         {
@@ -42,34 +44,41 @@ namespace NucleonEngine.Collisions
                 Body = GetComponent<NucleonRigidbody>();
             }
             catch { }
-        }
 
-        void Start()
-        {
             CubeModel = new CubeModel();
-            CubeModel.UpdateBounds(transform, (svector3)Position, (svector3)Scale);
 
             ActiveCollisions = new List<NucleonCollider>();
             CollidingPoints = new List<svector3>();
 
+            UpdateInterval = (sfloat)1f / (sfloat)UpdatesPerSecond;
+        }
+
+        void Start()
+        {
             NucleonManager = NucleonManager.Instance;
-            NucleonManager.RegisterCollider(this);
+            FetchCollisions();
         }
 
         void Update()
+        {
+            ElapsedUpdateTime += (sfloat)Time.deltaTime;
+            if(ElapsedUpdateTime >= UpdateInterval)
+            {
+                ElapsedUpdateTime = ElapsedUpdateTime % UpdateInterval;
+                FetchCollisions();
+            }
+        }
+
+        public void FetchCollisions()
         {
             CubeModel.UpdateBounds(transform, (svector3)Position, (svector3)Scale);
             Colliding = ActiveCollisions.Count > 0;
             DeltaPosition = ((svector3)transform.position + (svector3)Position) - LastPosition;
             LastPosition = ((svector3)transform.position + (svector3)Position);
 
-            FetchCollisions();
-        }
-
-        public void FetchCollisions()
-        {
-            foreach (NucleonBoxCollider BoxCollider in NucleonManager.Colliders)
+            for (int i = 0; i < NucleonManager.Colliders.Length; i++)
             {
+                NucleonBoxCollider BoxCollider = (NucleonBoxCollider)NucleonManager.Colliders[i];
                 if (BoxCollider != this)
                 {
                     bool Colliding = intersector.CC_I(CubeModel, BoxCollider.CubeModel);
@@ -89,7 +98,7 @@ namespace NucleonEngine.Collisions
                     }
                     if (!Colliding && DebugCollisionVertices)
                     {
-                        CollidingPoints = new List<svector3>();
+                        CollidingPoints.Clear();
                     }
                 }
             }

@@ -14,20 +14,20 @@ namespace NucleonEngine.Dynamics
         public float Mass = 1;
         public float GravityScale = 1;
 
-        [HideInInspector] public svector3 Velocity = svector3.Zero();
+        [HideInInspector] public svector3 Velocity;
 
-        [HideInInspector] public svector3 AbsoluteVelocity = svector3.Zero();
+        public svector3 AbsoluteVelocity { get; private set; }
         public bool Grounded { get; private set; }
         public NucleonBoxCollider Ground { get; private set; }
 
         private Vector3 CalculationVelocity;
         private sfloat GravityTimer;
-
         private Dictionary<int, bool[]> TouchingFaces = new Dictionary<int, bool[]>();
 
-        void Start()
+        private void Awake()
         {
-            Grounded = false;
+            Velocity = svector3.Zero();
+            AbsoluteVelocity = svector3.Zero();
         }
 
         void Update()
